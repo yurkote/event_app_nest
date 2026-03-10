@@ -12,4 +12,8 @@ export class AuthController {
     // Викликаємо сервіс, який ми написали раніше
     return this.authService.register(body.email, body.pass, body.fullName);
   }
+  @Post('login')
+  async login(@Body() body: { email: string; pass: string }) {
+    return this.authService.login(body.email, body.pass);
+  }
 }

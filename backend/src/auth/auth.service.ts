@@ -39,4 +39,25 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
     return { user, token };
   }
+  async login(email: string, pass: string) {
+    // 1. Знаходимо користувача по email
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    // 2. Порівнюємо паролі
+    const isPasswordValid = await bcrypt.compare(pass, user.passwordHash);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    // 3. Генеруємо JWT токен
+    const payload = { email: user.email, id: user.id };
+    const token = this.jwtService.sign(payload);
+
+    return { user, token };
+  }
 }
