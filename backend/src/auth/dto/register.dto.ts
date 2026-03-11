@@ -1,13 +1,7 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
+import { LoginDto } from './login.dto';
 
-export class RegisterDto {
-  @IsEmail({}, { message: 'Невірний формат email' })
-  email: string;
-
-  @IsNotEmpty()
-  @MinLength(6, { message: 'Пароль має бути не менше 6 символів' })
-  pass: string;
-
+export class RegisterDto extends LoginDto {
   @IsNotEmpty()
   fullName: string;
 }

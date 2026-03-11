@@ -1,6 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
+import { Event } from '@prisma/client';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
@@ -56,6 +63,29 @@ export class EventsService {
     });
   }
 
+  async update(eventId: string, userId: string, data: UpdateEventDto) {
+    const event = await this.validateEventExists(eventId);
+
+    // Перевіряємо, чи користувач є творцем події
+    this.validateEventAuthor(event.creatorId, userId);
+
+    return this.prisma.event.update({
+      where: { id: eventId },
+      data: {
+        ...data,
+      },
+    });
+  }
+
+  async remove(eventId: string, userId: string) {
+    const event = await this.validateEventExists(eventId);
+
+    // Перевіряємо, чи користувач є творцем події
+    this.validateEventAuthor(event.creatorId, userId);
+
+    return this.prisma.event.delete({ where: { id: eventId } });
+  }
+
   async findAll() {
     return this.prisma.event.findMany({
       orderBy: { eventDate: 'asc' },
@@ -63,11 +93,26 @@ export class EventsService {
     });
   }
 
+  async findUserEvents(userId: string) {
+    return this.prisma.event.findMany({
+      where: {
+        OR: [
+          { creatorId: userId }, // Події, які створив користувач
+          { participants: { some: { userId } } }, // Події, до яких приєднався користувач
+        ],
+      },
+      orderBy: { eventDate: 'asc' },
+      include: { creator: true },
+    });
+  }
+
   // Допоміжні функції
-  private async validateEventExists(id: string) {
-    const event = await this.prisma.event.findUnique({ where: { id } });
+  private async validateEventExists(eventId: string): Promise<Event> {
+    const event = await this.prisma.event.findUnique({
+      where: { id: eventId },
+    });
     if (!event) {
-      throw new BadRequestException('Подія не знайдена');
+      throw new NotFoundException('Подію не знайдено');
     }
     return event; // Повертаємо об'єкт, він може знадобитися далі
   }
@@ -80,5 +125,13 @@ export class EventsService {
       where: { userId_eventId: { eventId, userId } },
     });
     return !!participant; // true якщо учасник існує, інакше false
+  }
+
+  private validateEventAuthor(creatorId: string, userId: string): void {
+    if (creatorId !== userId) {
+      throw new ForbiddenException(
+        'Ви не є автором цієї події, тому не можете її редагувати чи видаляти',
+      );
+    }
   }
 }
