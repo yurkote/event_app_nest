@@ -1,25 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateEventDto } from './dto/create-event.dto';
 
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    data: {
-      title: string;
-      description?: string;
-      eventDate: string;
-      location?: string;
-    },
-    creatorId: string,
-  ) {
-    console.log('Creator ID is:', creatorId);
+  async create(data: CreateEventDto, creatorId: string) {
+    const eventDate = new Date(data.eventDate);
+    const now = new Date();
+    if (eventDate < now) {
+      throw new BadRequestException('Дата події не може бути в минулому');
+    }
     return this.prisma.event.create({
       data: {
         ...data,
-        eventDate: new Date(data.eventDate),
-        creator: { connect: { id: creatorId } },
+        eventDate,
+        creatorId,
       },
     });
   }
