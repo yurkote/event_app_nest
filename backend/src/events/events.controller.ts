@@ -31,4 +31,10 @@ export class EventsController {
   async join(@Param('id') eventId: string, @Request() req) {
     return this.eventsService.join(eventId, req.user.id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/leave')
+  async leave(@Param('id') eventId: string, @Request() req) {
+    return this.eventsService.leave(eventId, req.user.id);
+  }
 }
