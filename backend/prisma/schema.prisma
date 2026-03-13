@@ -28,6 +28,7 @@ model Event {
   description String?
   eventDate   DateTime
   location    String?
+  capacity    Int?
   createdAt   DateTime      @default(now())
   creatorId   String
   creator     User          @relation("UserCreatedEvents", fields: [creatorId], references: [id])

@@ -30,6 +30,17 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async findMyEvents(@Request() req) {
+    return this.eventsService.findUserEvents(req.user.id);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.eventsService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post(':id/join')
   async join(@Param('id') eventId: string, @Request() req) {
     return this.eventsService.join(eventId, req.user.id);
@@ -42,7 +53,7 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
+  @Patch(':id/edit')
   async update(
     @Param('id') eventId: string,
     @Request() req,

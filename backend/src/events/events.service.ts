@@ -6,8 +6,12 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
-import { Event } from '@prisma/client';
+import { Prisma, Event } from '@prisma/client';
 import { UpdateEventDto } from './dto/update-event.dto';
+
+type EventWithCount = Prisma.EventGetPayload<{
+  include: { _count: { select: { participants: true } } };
+}>;
 
 @Injectable()
 export class EventsService {
@@ -29,13 +33,20 @@ export class EventsService {
   }
   async join(eventId: string, userId: string) {
     // Перевіряємо, чи існує подія
-    await this.validateEventExists(eventId);
+    const event = await this.validateEventExists(eventId);
 
     // Перевіряємо, чи користувач вже приєднався
     const isJoined = await this.checkParticipation(eventId, userId);
     if (isJoined) {
       throw new BadRequestException('Ви вже приєдналися до цієї події');
     }
+    // Перевіряємо, чи не досягнуто максимальної кількості учасників
+    if (event.capacity && event._count.participants >= event.capacity) {
+      throw new BadRequestException(
+        'Досягнуто максимальної кількості учасників',
+      );
+    }
+
     return this.prisma.participant.create({
       data: {
         eventId,
@@ -73,6 +84,8 @@ export class EventsService {
       where: { id: eventId },
       data: {
         ...data,
+        capacity: data.capacity ? Number(data.capacity) : null, // Якщо capacity не вказано, залишаємо його без змін
+        eventDate: data.eventDate ? new Date(data.eventDate) : event.eventDate, // Якщо eventDate не вказано, залишаємо його без змін
       },
     });
   }
@@ -89,7 +102,23 @@ export class EventsService {
   async findAll() {
     return this.prisma.event.findMany({
       orderBy: { eventDate: 'asc' },
-      include: { _count: { select: { participants: true } } }, // Покаже кількість учасників
+      include: {
+        _count: { select: { participants: true } },
+        participants: { select: { userId: true } },
+      }, // Покаже кількість учасників
+    });
+  }
+
+  async findOne(id: string) {
+    return this.prisma.event.findUnique({
+      where: { id },
+      include: {
+        creator: { select: { fullName: true, email: true } },
+        participants: {
+          include: { user: { select: { fullName: true } } },
+        },
+        _count: { select: { participants: true } },
+      },
     });
   }
 
@@ -107,9 +136,10 @@ export class EventsService {
   }
 
   // Допоміжні функції
-  private async validateEventExists(eventId: string): Promise<Event> {
+  private async validateEventExists(eventId: string): Promise<EventWithCount> {
     const event = await this.prisma.event.findUnique({
       where: { id: eventId },
+      include: { _count: { select: { participants: true } } },
     });
     if (!event) {
       throw new NotFoundException('Подію не знайдено');
