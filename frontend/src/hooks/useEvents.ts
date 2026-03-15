@@ -96,3 +96,12 @@ export const useEditEvent = (eventId: string) => {
     },
   });
 };
+
+export const useDeleteEvent = () => {
+  return useMutation({
+    mutationFn: (eventId: string) => EventService.delete(eventId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+    },
+  });
+};

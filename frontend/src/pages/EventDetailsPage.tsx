@@ -105,14 +105,12 @@ const EventDetailsPage = () => {
               ))}
             </ul>
 
-            {!event.isOrganizer && (
-              <button
-                onClick={handleJoinLeave}
-                className={`w-full py-3 rounded-xl font-bold transition ${event.isParticipant ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-blue-600 text-white hover:bg-blue-700"}`}
-              >
-                {event.isParticipant ? "Залишити подію" : "Приєднатися"}
-              </button>
-            )}
+            <button
+              onClick={handleJoinLeave}
+              className={`w-full py-3 rounded-xl font-bold transition ${event.isParticipant ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-blue-600 text-white hover:bg-blue-700"}`}
+            >
+              {event.isParticipant ? "Залишити подію" : "Приєднатися"}
+            </button>
           </div>
         </div>
       </div>

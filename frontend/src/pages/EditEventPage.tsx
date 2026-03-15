@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import { useEditEvent, useEvent } from "../hooks/useEvents";
 import type { UpdateEventDto } from "../types";
 import { useEffect } from "react";
+import { getTodayForInput } from "../utils/getTodayForInput";
 
 const EditEventPage = () => {
   const { id } = useParams();
@@ -78,6 +79,7 @@ const EditEventPage = () => {
                 type="datetime-local"
                 className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
                 required
+                min={getTodayForInput()}
               />
             </div>
             <div>
@@ -104,6 +106,7 @@ const EditEventPage = () => {
           </div>
 
           <button
+            disabled={editMutation.isPending}
             type="submit"
             className="w-full bg-amber-500 text-white py-3 rounded-lg font-bold hover:bg-amber-600 transition shadow-md"
           >
