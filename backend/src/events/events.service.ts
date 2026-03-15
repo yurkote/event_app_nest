@@ -80,12 +80,16 @@ export class EventsService {
     // Перевіряємо, чи користувач є творцем події
     this.validateEventAuthor(event.creatorId, userId);
 
+    const {title, description, location, eventDate, capacity} = data;
+
     return this.prisma.event.update({
       where: { id: eventId },
       data: {
-        ...data,
-        capacity: data.capacity ? Number(data.capacity) : null, // Якщо capacity не вказано, залишаємо його без змін
-        eventDate: data.eventDate ? new Date(data.eventDate) : event.eventDate, // Якщо eventDate не вказано, залишаємо його без змін
+        title,
+        description,
+        location,
+        capacity: capacity ? Number(capacity) : null, // Якщо capacity не вказано, залишаємо його без змін
+        eventDate: eventDate ? new Date(eventDate) : event.eventDate, // Якщо eventDate не вказано, залишаємо його без змін
       },
     });
   }

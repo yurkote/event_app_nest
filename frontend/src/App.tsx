@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import { queryClient } from "./api/queryClient";
 import { Toaster } from "react-hot-toast";
 import EventDetailsPage from "./pages/EventDetailsPage";
+import EditEventPage from "./pages/EditEventPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
               <Route path="/events" element={<EventsPage />} />
             </Route>
             <Route path="/events/:id" element={<EventDetailsPage />} />
+            <Route path="/events/:id/edit" element={<EditEventPage />} />
           </Route>
 
           <Route path="*" element={<h1>404 - Not Found</h1>} />

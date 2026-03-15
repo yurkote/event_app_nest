@@ -53,7 +53,7 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id/edit')
+  @Patch(':id')
   async update(
     @Param('id') eventId: string,
     @Request() req,

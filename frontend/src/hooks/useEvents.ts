@@ -1,13 +1,9 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  keepPreviousData,
-} from "@tanstack/react-query";
+import { useQuery, useMutation, keepPreviousData } from "@tanstack/react-query";
 import { EventService } from "../services";
 import { eventKeys } from "./keys";
 import { useAuthStore } from "../store/authStore";
-import type { Participant } from "../types";
+import type { Participant, UpdateEventDto } from "../types";
+import { queryClient } from "../api/queryClient";
 
 export const useEvents = () => {
   return useQuery({
@@ -49,7 +45,7 @@ export const useMyEvents = () => {
 // --- MUTATIONS ---
 
 export const useCreateEvent = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: EventService.create,
@@ -61,7 +57,7 @@ export const useCreateEvent = () => {
 };
 
 export const useJoinEvent = (eventId: string) => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => {
@@ -77,7 +73,7 @@ export const useJoinEvent = (eventId: string) => {
 };
 
 export const useLeaveEvent = (eventId: string) => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => {
@@ -88,6 +84,15 @@ export const useLeaveEvent = (eventId: string) => {
       // Оновлюємо деталі цієї події та список моїх подій
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: eventKeys.mine() });
+    },
+  });
+};
+
+export const useEditEvent = (eventId: string) => {
+  return useMutation({
+    mutationFn: (data: UpdateEventDto) => EventService.update(eventId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
     },
   });
 };
