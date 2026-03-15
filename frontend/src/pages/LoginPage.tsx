@@ -1,45 +1,20 @@
 import { useForm } from "react-hook-form";
-import { useNavigate, Link, Navigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
-import api from "../api/axios";
+import { Link, Navigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-import type { AuthResponse } from "../types";
+import type { LoginDto } from "../types";
+import { useLogin } from "../hooks/authHooks";
 
 const LoginPage = () => {
-  const { register, handleSubmit } = useForm();
-  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm<LoginDto>();
+  const { token } = useAuthStore();
+  const { mutate, isPending } = useLogin();
 
-  // Zustand дії та стан
-  const { token, setAuth } = useAuthStore();
-
-  // Mutation для входу
-  const loginMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await api.post("/auth/login", {
-        email: data.email,
-        pass: data.password,
-      });
-      return response.data;
-    },
-    onSuccess: (data: AuthResponse) => {
-      // Оновлюємо глобальний стан (Zustand сам оновить localStorage)
-      setAuth(data.token, data.user);
-
-      // Більше не потрібно reload! React Query та Zustand синхронізують UI
-      navigate("/events");
-    },
-    onError: (error: any) => {
-      alert(error.response?.data?.message || "Помилка входу. Перевірте дані.");
-    },
-  });
-
-  // Якщо користувач вже залогінений — редирект
   if (token) {
     return <Navigate to="/events" replace />;
   }
 
-  const onSubmit = (data: any) => {
-    loginMutation.mutate(data);
+  const onSubmit = (data: LoginDto) => {
+    mutate(data);
   };
 
   return (
@@ -57,7 +32,7 @@ const LoginPage = () => {
             <input
               {...register("email", { required: true })}
               type="email"
-              disabled={loginMutation.isPending}
+              disabled={isPending}
               className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
               placeholder="you@example.com"
             />
@@ -68,9 +43,9 @@ const LoginPage = () => {
               Пароль
             </label>
             <input
-              {...register("password", { required: true })}
+              {...register("pass", { required: true })}
               type="password"
-              disabled={loginMutation.isPending}
+              disabled={isPending}
               className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
               placeholder="••••••••"
             />
@@ -78,10 +53,10 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            disabled={loginMutation.isPending}
+            disabled={isPending}
             className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-blue-400"
           >
-            {loginMutation.isPending ? "Вхід..." : "Увійти"}
+            {isPending ? "Вхід..." : "Увійти"}
           </button>
         </form>
 

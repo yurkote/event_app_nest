@@ -1,36 +1,124 @@
+import { useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { EventService } from "../services";
+import { useAuthStore } from "../store/authStore";
 import { useEvents } from "../hooks/useEvents";
+import { eventKeys } from "../hooks/keys";
 
-const EventsPage = () => {
-  const { data: events, isLoading, error } = useEvents();
+export default function EventsPage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+  const { data: events = [], isLoading, isError } = useEvents();
+  const refreshEvents = () =>
+    queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
 
-  if (isLoading) {
-    return <div>Завантаження подій...</div>;
-  }
+  const leaveMutation = useMutation({
+    mutationFn: (id: string) => EventService.leave(id),
+    onSuccess: refreshEvents,
+  });
 
-  if (error) {
-    return <div>Помилка завантаження подій: {(error as Error).message}</div>;
-  }
+  const joinMutation = useMutation({
+    mutationFn: (id: string) => EventService.join(id),
+    onSuccess: refreshEvents,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => EventService.delete(id),
+    onSuccess: refreshEvents,
+  });
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (window.confirm("Ви впевнені?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleAction = (e: React.MouseEvent, action: any, id: string) => {
+    e.stopPropagation();
+    action(id);
+  };
+
+  if (isLoading && events.length === 0)
+    return <div className="text-center p-10">Завантаження подій...</div>;
+  if (isError)
+    return (
+      <div className="text-center p-10 text-red-500">Помилка завантаження</div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Список Подій
-      </h1>
+    <main className="max-w-6xl mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events?.map((event) => (
-          <div
-            key={event.id}
-            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200"
-          >
-            <h2 className="text-xl font-semibold mb-2 text-gray-800">
-              {event.title} - {new Date(event.eventDate).toLocaleDateString()}
-            </h2>
-            <p className="text-gray-600 mb-4">{event.description}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+        {events.map((event) => {
+          const isParticipant = event.participants?.some(
+            (p) => p.userId === user?.id,
+          );
+          const isCreator = event.creatorId === user?.id;
+          const isPending = joinMutation.isPending || leaveMutation.isPending;
 
-export default EventsPage;
+          return (
+            <div
+              key={event.id}
+              onClick={() => navigate(`/events/${event.id}`)}
+              className="group cursor-pointer bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition"
+            >
+              <h3 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition">
+                {event.title}
+              </h3>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                {event.description}
+              </p>
+
+              <div className="text-sm text-gray-500 space-y-1">
+                <p>📍 {event.location}</p>
+                <p>📅 {new Date(event.eventDate).toLocaleDateString()}</p>
+                <p>👥 Учасників: {event._count?.participants ?? 0}</p>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <button
+                  onClick={(e) =>
+                    handleAction(
+                      e,
+                      isParticipant
+                        ? leaveMutation.mutate
+                        : joinMutation.mutate,
+                      event.id,
+                    )
+                  }
+                  disabled={isPending}
+                  className={`w-full py-2 rounded-lg transition font-bold ${
+                    isPending
+                      ? "bg-gray-200 cursor-not-allowed"
+                      : isParticipant
+                        ? "bg-red-50 text-red-600 hover:bg-red-600 hover:text-white"
+                        : "bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white"
+                  }`}
+                >
+                  {isPending
+                    ? "Зачекайте..."
+                    : isParticipant
+                      ? "Відписатися"
+                      : "Приєднатися"}
+                </button>
+
+                {isCreator && (
+                  <button
+                    disabled={deleteMutation.isPending}
+                    onClick={(e) => handleDelete(e, event.id)}
+                    className="w-full text-red-500 text-sm hover:underline mt-2 text-center disabled:opacity-50"
+                  >
+                    {deleteMutation.isPending
+                      ? "Видалення..."
+                      : "Видалити мою подію"}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </main>
+  );
+}

@@ -31,7 +31,7 @@ export const EventService = {
   delete: (id: string) => api.delete<void>(`/events/${id}`),
 
   // Участь
-  join: (id: string) => api.post<{ message: string }>(`/events/${id}/join`),
+  join: (eventId: string) => api.post<{ message: string }>(`/events/${eventId}/join`),
 
   leave: (id: string) => api.post<{ message: string }>(`/events/${id}/leave`),
 

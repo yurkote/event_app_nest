@@ -5,7 +5,7 @@ const MainLayout = () => (
   <>
     <Navbar />
     <main>
-      <Outlet /> {/* Тут рендеритимуться ваші сторінки */}
+      <Outlet />
     </main>
   </>
 );

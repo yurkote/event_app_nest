@@ -1,3 +1,9 @@
+export interface ApiErrorResponse {
+  message: string | string[];
+  error?: string;
+  statusCode?: number;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -32,14 +38,14 @@ export interface Participant {
 // POST /auth/register
 export interface RegisterDto {
   email: string;
-  passwordHash: string; // On the frontend, this is just the password, the backend handles the hashing
+  pass: string; // On the frontend, this is just the password, the backend handles the hashing
   fullName?: string;
 }
 
 // POST /auth/login
 export interface LoginDto {
   email: string;
-  passwordHash: string;
+  pass: string;
 }
 
 // Response after login

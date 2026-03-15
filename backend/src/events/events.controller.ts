@@ -30,7 +30,7 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('me')
+  @Get('my')
   async findMyEvents(@Request() req) {
     return this.eventsService.findUserEvents(req.user.id);
   }

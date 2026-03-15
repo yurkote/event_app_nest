@@ -110,7 +110,7 @@ export class EventsService {
   }
 
   async findOne(id: string) {
-    return this.prisma.event.findUnique({
+    const event = await this.prisma.event.findUnique({
       where: { id },
       include: {
         creator: { select: { fullName: true, email: true } },
@@ -120,6 +120,11 @@ export class EventsService {
         _count: { select: { participants: true } },
       },
     });
+    if (!event) {
+      throw new NotFoundException(`Подію з ID ${id} не знайдено`);
+    }
+
+    return event;
   }
 
   async findUserEvents(userId: string) {
