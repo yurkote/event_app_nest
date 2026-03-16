@@ -45,43 +45,36 @@ export const useMyEvents = () => {
 // --- MUTATIONS ---
 
 export const useCreateEvent = () => {
-  // const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: EventService.create,
     onSuccess: () => {
-      // Оновлюємо список подій після створення нової
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
     },
   });
 };
 
-export const useJoinEvent = (eventId: string) => {
-  // const queryClient = useQueryClient();
-
+export const useJoinEvent = () => {
   return useMutation({
-    mutationFn: () => {
+    mutationFn: (eventId: string) => {
       if (!eventId) throw new Error("No ID provided");
       return EventService.join(eventId);
     },
-    onSuccess: () => {
-      // Оновлюємо деталі цієї події та список моїх подій
+    onSuccess: (_, eventId) => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: eventKeys.mine() });
     },
   });
 };
 
-export const useLeaveEvent = (eventId: string) => {
-  // const queryClient = useQueryClient();
-
+export const useLeaveEvent = () => {
   return useMutation({
-    mutationFn: () => {
+    mutationFn: (eventId: string) => {
       if (!eventId) throw new Error("No ID provided");
       return EventService.leave(eventId);
     },
-    onSuccess: () => {
-      // Оновлюємо деталі цієї події та список моїх подій
+    onSuccess: (_, eventId) => {
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
       queryClient.invalidateQueries({ queryKey: eventKeys.mine() });
     },

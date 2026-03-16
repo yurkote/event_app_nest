@@ -1,34 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
-import { useDeleteEvent, useEvents } from "../hooks/useEvents";
-import { queryClient } from "../api/queryClient";
-import { eventKeys } from "../hooks/keys";
-import { useMutation } from "@tanstack/react-query";
-import { EventService } from "../services";
-
+import {
+  useDeleteEvent,
+  useEvents,
+  useJoinEvent,
+  useLeaveEvent,
+} from "../hooks/useEvents";
+// import { eventKeys } from "../hooks/keys";
+// import { useMutation } from "@tanstack/react-query";
+// import { EventService } from "../services";
+// import { queryClient } from "../api/queryClient";
 
 export default function EventsPage() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const { data: events = [], isLoading, isError } = useEvents();
+  const joinMutation = useJoinEvent();
+  const leaveMutation = useLeaveEvent();
   const deleteMutation = useDeleteEvent();
-  const refreshEvents = () =>
-    queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
-
-  const leaveMutation = useMutation({
-    mutationFn: (id: string) => EventService.leave(id),
-    onSuccess: refreshEvents,
-  });
-
-  const joinMutation = useMutation({
-    mutationFn: (id: string) => EventService.join(id),
-    onSuccess: refreshEvents,
-  });
-
-  // const deleteMutation = useMutation({
-  //   mutationFn: (id: string) => EventService.delete(id),
-  //   onSuccess: refreshEvents,
-  // });
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();

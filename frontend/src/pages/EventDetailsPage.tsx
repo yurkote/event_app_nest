@@ -7,8 +7,8 @@ const EventDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: event, isLoading, isError } = useEvent(id || "");
-  const joinMutation = useJoinEvent(id!);
-  const leaveMutation = useLeaveEvent(id!);
+  const joinMutation = useJoinEvent();
+  const leaveMutation = useLeaveEvent();
 
   //TODO: Дизайн сторінки або авто редірект для відсутньої події
   if (isError) {
@@ -25,7 +25,7 @@ const EventDetailsPage = () => {
     return <div className="p-10 text-center">Завантаження...</div>;
 
   const handleJoinLeave = () => {
-    event.isParticipant ? leaveMutation.mutate() : joinMutation.mutate();
+    event.isParticipant ? leaveMutation.mutate(id!) : joinMutation.mutate(id!);
   };
 
   const handleDelete = async () => {
