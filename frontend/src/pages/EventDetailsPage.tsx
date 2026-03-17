@@ -14,22 +14,22 @@ const EventDetailsPage = () => {
   if (isError) {
     return (
       <div className="error-container">
-        <h2>Упс! Такої події не існує</h2>
+        <h2>Oops! This event does not exist</h2>
         <button onClick={() => navigate("/events")}>
-          Повернутися до списку
+          Return to the list of events
         </button>
       </div>
     );
   }
   if (isLoading || !event)
-    return <div className="p-10 text-center">Завантаження...</div>;
+    return <div className="p-10 text-center">Fetching...</div>;
 
   const handleJoinLeave = () => {
     event.isParticipant ? leaveMutation.mutate(id!) : joinMutation.mutate(id!);
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Видалити цю подію?")) {
+    if (window.confirm("Delete this event?")) {
       await api.delete(`/events/${id}`);
       navigate("/events");
     }
@@ -45,7 +45,7 @@ const EventDetailsPage = () => {
               {event.title}
             </h1>
             <p className="text-gray-500 mt-2">
-              Організатор: {event.creator?.fullName}
+              Organizer: {event.creator?.fullName}
             </p>
           </div>
           {event.isOrganizer && (
@@ -54,13 +54,13 @@ const EventDetailsPage = () => {
                 onClick={() => navigate(`/events/${id}/edit`)}
                 className="bg-amber-100 text-amber-700 px-4 py-2 rounded-lg font-medium"
               >
-                Редагувати
+                Edit
               </button>
               <button
                 onClick={handleDelete}
                 className="bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium"
               >
-                Видалити
+                Delete
               </button>
             </div>
           )}
@@ -68,28 +68,28 @@ const EventDetailsPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
-            <h2 className="text-xl font-semibold mb-3">Опис</h2>
+            <h2 className="text-xl font-semibold mb-3">Description</h2>
             <p className="text-gray-700 leading-relaxed mb-6">
-              {event.description || "Опис відсутній"}
+              {event.description || "No description here..."}
             </p>
 
             <div className="bg-blue-50 p-4 rounded-xl space-y-2">
               <p>
-                📅 <strong>Дата:</strong>{" "}
+                📅 <strong>Date:</strong>{" "}
                 {new Date(event.eventDate).toLocaleString()}
               </p>
               <p>
-                📍 <strong>Локація:</strong> {event.location}
+                📍 <strong>Location:</strong> {event.location}
               </p>
               <p>
-                👥 <strong>Місткість:</strong> {event.capacity || "Необмежено"}
+                👥 <strong>Capacity:</strong> {event.capacity || "Infinity"}
               </p>
             </div>
           </div>
 
           <div>
             <h2 className="text-xl font-semibold mb-3">
-              Учасники ({event._count?.participants})
+              Participants ({event._count?.participants})
             </h2>
             <ul className="space-y-2 mb-6">
               {event.participants?.map((p: any) => (
@@ -109,7 +109,7 @@ const EventDetailsPage = () => {
               onClick={handleJoinLeave}
               className={`w-full py-3 rounded-xl font-bold transition ${event.isParticipant ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-blue-600 text-white hover:bg-blue-700"}`}
             >
-              {event.isParticipant ? "Залишити подію" : "Приєднатися"}
+              {event.isParticipant ? "Leave event" : "Join event"}
             </button>
           </div>
         </div>

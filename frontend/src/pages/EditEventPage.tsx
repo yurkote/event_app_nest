@@ -2,21 +2,38 @@ import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useEditEvent, useEvent } from "../hooks/useEvents";
-import type { UpdateEventDto } from "../types";
+import type {
+  UpdateEventDto,
+  CreateEventFormValues,
+  UpdateEventFormValues,
+} from "../types";
 import { useEffect } from "react";
-import { getTodayForInput } from "../utils/getTodayForInput";
+import { getDateForInput } from "../utils/getDateForInput";
+import { getTimeForInput } from "../utils/getTimeForInput";
 
 const EditEventPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { register, handleSubmit, reset } = useForm<UpdateEventDto>();
+  const { register, handleSubmit, reset } = useForm<UpdateEventFormValues>();
   const { data: event } = useEvent(id!);
   const editMutation = useEditEvent(id!);
 
-  const onSubmit = (formData: UpdateEventDto) => {
-    editMutation.mutate(formData, {
+  const onSubmit = (formData: UpdateEventFormValues) => {
+    const eventDate = new Date(
+      `${formData.formDate}T${formData.formTime}`,
+    ).toISOString();
+
+    const dto: UpdateEventDto = {
+      title: formData.title,
+      description: formData.description,
+      location: formData.location,
+      capacity: formData.capacity,
+      //TODO: visibility: data.visibility,
+      eventDate,
+    };
+    editMutation.mutate(dto, {
       onSuccess: () => {
-        alert("Подію оновлено");
+        alert("Event updated");
         navigate(`/events/${id}`);
       },
     });
@@ -24,94 +41,161 @@ const EditEventPage = () => {
 
   useEffect(() => {
     if (event) {
-      const formattedDate = event.eventDate.substring(0, 16);
       reset({
         ...event,
-        eventDate: formattedDate,
+        formDate: getDateForInput(event.eventDate),
+        formTime: getTimeForInput(event.eventDate),
       });
     }
   }, [event, reset]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="pb-1 min-h-screen bg-gray-50">
       <Navbar />
-      <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-lg">
+      <div className=" max-w-2xl mx-auto my-10 p-8 bg-white rounded-xl shadow-lg">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Редагування події</h2>
+          <h2 className="text-2xl font-bold">Editing Event</h2>
+
           <button
+            type="button"
             onClick={() => navigate(-1)}
-            className="text-gray-500 hover:text-gray-700"
+            className="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
           >
-            Скасувати
+            Cancel
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Назва події */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Назва
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Event Title <span className="text-red-500">*</span>
             </label>
             <input
               {...register("title")}
-              className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
+              type="text"
+              placeholder="e.g., Tech Conference 2025"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               required
             />
           </div>
 
+          {/* Опис */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Опис
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description <span className="text-red-500">*</span>
             </label>
             <textarea
               {...register("description")}
-              className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
               rows={4}
-            />
+              placeholder="Describe what makes your event special..."
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+            ></textarea>
           </div>
 
+          {/* Дата та Час */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Дата та час
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("eventDate")}
-                type="datetime-local"
-                className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
+                {...register("formDate")}
+                min={getDateForInput()}
+                type="date"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-gray-500"
                 required
-                min={getTodayForInput()}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Макс. учасників
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Time <span className="text-red-500">*</span>
               </label>
               <input
-                {...register("capacity")}
-                type="number"
-                className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
+                {...register("formTime")}
+                type="time"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-gray-500"
+                required
               />
             </div>
           </div>
 
+          {/* Локація */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Локація
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location <span className="text-red-500">*</span>
             </label>
             <input
               {...register("location")}
-              className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500"
+              type="text"
+              placeholder="e.g., Convention Center, San Francisco"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
               required
             />
           </div>
 
-          <button
-            disabled={editMutation.isPending}
-            type="submit"
-            className="w-full bg-amber-500 text-white py-3 rounded-lg font-bold hover:bg-amber-600 transition shadow-md"
-          >
-            Зберегти зміни
-          </button>
+          {/* Місткість */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Capacity (optional)
+            </label>
+            <input
+              {...register("capacity", {
+                min: {
+                  value: 1,
+                  message: "Число має бути додатнім",
+                },
+                setValueAs: (v) => (v === "" || v === null ? null : Number(v)),
+              })}
+              type="number"
+              placeholder="Leave empty for unlimited"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            />
+            <p className="mt-2 text-xs text-gray-400">
+              Maximum number of participants. Leave empty for unlimited
+              capacity.
+            </p>
+          </div>
+          {/* Видимість (Radio)
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-700">Visibility</p>
+        
+                      <label className="flex items-center space-x-3 cursor-pointer group">
+                        <input
+                        //TODO: {...register("visibility")}
+                          type="radio"
+                          name="visibility"
+                          defaultChecked
+                          className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          <span className="font-medium">Public</span> - Anyone can see
+                          and join this event
+                        </span>
+                      </label>
+        
+                      <label className="flex items-center space-x-3 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="visibility"
+                          className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          <span className="font-medium">Private</span> - Only invited
+                          people can see this event
+                        </span>
+                      </label>
+                    </div> */}
+
+          {/* Кнопки дій */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <button
+              type="submit"
+              className="flex-1 px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all"
+            >
+              Update Event
+            </button>
+          </div>
         </form>
       </div>
     </div>

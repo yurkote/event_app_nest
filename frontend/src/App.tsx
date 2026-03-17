@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import EditEventPage from "./pages/EditEventPage";
 import CreateEventPage from "./pages/CreateEventPage";
+import CalendarPage from "./pages/CalendarPage";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/events/:id" element={<EventDetailsPage />} />
             <Route path="/events/:id/edit" element={<EditEventPage />} />
             <Route path="/events/create" element={<CreateEventPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
           </Route>
 
           <Route path="*" element={<h1>404 - Not Found</h1>} />

@@ -23,7 +23,7 @@ export class EventsService {
     if (eventDate < now) {
       throw new BadRequestException('Дата події не може бути в минулому');
     }
-    return this.prisma.event.create({
+    return await this.prisma.event.create({
       data: {
         ...data,
         eventDate,

@@ -1,2 +1,54 @@
 @import "tailwindcss";
 
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: #6365f117;
+  border-left: #6365f16b 3px solid;
+  border-top: 3px solid #6365f16b;
+}
+.fc .fc-button-primary {
+  background-color: oklch(51.1% 0.262 276.966);
+  border-color: oklch(92.8% 0.006 264.531);
+  color: #fff;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: oklch(58.5% 0.233 277.117);
+  border-color: oklch(92.8% 0.006 264.531);
+  color: #fff;
+}
+.fc .fc-button {
+  display: flex;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin: 2px;
+}
+.fc .fc-button:hover {
+  background-color: oklch(58.5% 0.233 277.117);
+  border-color: #fff;
+}
+.fc .fc-button:focus {
+  box-shadow: none;
+}
+.fc .fc-button:active {
+  box-shadow: none;
+}
+.fc .fc-button-primary:disabled {
+  background-color: oklch(58.5% 0.233 277.117);
+  border-color: oklch(58.5% 0.233 277.117);
+  color: var(--fc-button-text-color);
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus,
+.fc .fc-button-primary:not(:disabled):active:focus {
+  box-shadow: none;
+}
+.fc-direction-ltr .fc-daygrid-event.fc-event-end, .fc-direction-rtl .fc-daygrid-event.fc-event-start {
+  background-color: oklch(51.1% 0.262 276.966);
+  font-size: 12px;
+}
+.fc-direction-ltr .fc-daygrid-event.fc-event-end:hover, .fc-direction-rtl .fc-daygrid-event.fc-event-start {
+  background-color: oklch(58.5% 0.233 277.117);
+  font-size: 12px;
+}
+.fc-daygrid-event-dot {
+  border: none;
+}

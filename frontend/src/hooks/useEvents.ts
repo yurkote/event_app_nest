@@ -4,6 +4,7 @@ import { eventKeys } from "./keys";
 import { useAuthStore } from "../store/authStore";
 import type { Participant, UpdateEventDto } from "../types";
 import { queryClient } from "../api/queryClient";
+import { useNavigate } from "react-router-dom";
 
 export const useEvents = () => {
   return useQuery({
@@ -45,10 +46,14 @@ export const useMyEvents = () => {
 // --- MUTATIONS ---
 
 export const useCreateEvent = () => {
+  const navigate = useNavigate();
+  
   return useMutation({
     mutationFn: EventService.create,
-    onSuccess: () => {
+    onSuccess: (newEvent) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+      const id = newEvent.data.id;
+      navigate(`/events/${id}`);
     },
   });
 };

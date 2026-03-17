@@ -19,7 +19,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Реєстрація
+          Create an account
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -59,14 +59,14 @@ export default function RegisterPage() {
               isPending ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
             }`}
           >
-            {isPending ? "Створення..." : "Створити акаунт"}
+            {isPending ? "Signing up..." : "Sign up"}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Вже є акаунт?{" "}
+          Already have an account?{" "}
           <Link to="/login" className="text-blue-600 hover:underline">
-            Увійти
+            Sign In
           </Link>
         </p>
       </div>

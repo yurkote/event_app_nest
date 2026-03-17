@@ -21,7 +21,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          Вхід у систему
+          Log In
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -40,7 +40,7 @@ const LoginPage = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Пароль
+              Password
             </label>
             <input
               {...register("pass", { required: true })}
@@ -56,14 +56,14 @@ const LoginPage = () => {
             disabled={isPending}
             className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-blue-400"
           >
-            {isPending ? "Вхід..." : "Увійти"}
+            {isPending ? "Logging in..." : "Log In"}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Немає акаунту?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="text-blue-600 hover:underline">
-            Зареєструватися
+            Sign Up
           </Link>
         </p>
       </div>

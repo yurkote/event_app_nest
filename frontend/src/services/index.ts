@@ -36,5 +36,5 @@ export const EventService = {
   leave: (id: string) => api.post<{ message: string }>(`/events/${id}/leave`),
 
   // Календар користувача
-  getMyEvents: () => api.get<Event[]>("/users/me/events"),
+  getMyEvents: () => api.get<Event[]>("/events/my"),
 };

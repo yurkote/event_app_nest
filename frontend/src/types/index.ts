@@ -76,3 +76,13 @@ export interface EventDetailResponse extends Event {
   creator: User;
   participants: (Participant & { user: User })[];
 }
+
+export interface CreateEventFormValues extends Omit<CreateEventDto, "eventDate"> {
+  formDate: string;
+  formTime: string;
+}
+
+export interface UpdateEventFormValues extends Omit<UpdateEventDto, "eventDate"> {
+  formDate: string;
+  formTime: string;
+}
