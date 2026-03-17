@@ -4,9 +4,12 @@ import {
   IsDateString,
   MinDate,
   IsNumber,
+  IsEnum,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { EventType } from '@prisma/client';
 
 export class CreateEventDto {
   @IsString()
@@ -34,4 +37,13 @@ export class CreateEventDto {
   @IsString()
   @ApiProperty({ example: '123 Main St' })
   location?: string;
+
+  @IsEnum(EventType)
+  @IsOptional()
+  @ApiProperty({
+    enum: EventType,
+    example: 'PUBLIC',
+    description: 'Type of event: PUBLIC or PRIVATE',
+  })
+  type?: EventType;
 }

@@ -2,12 +2,9 @@ import { useForm } from "react-hook-form";
 import Navbar from "../components/Navbar";
 import type { CreateEventDto, CreateEventFormValues } from "../types";
 import { useCreateEvent } from "../hooks/useEvents";
-import { getDateForInput } from "../utils/getDateForInput";
 import { useNavigate } from "react-router-dom";
+import { getDateForInput } from "../utils/getDateForInput";
 import { getTimeForInput } from "../utils/getTimeForInput";
-
-//TODO: Visibility radio button in prisma schema and create form
-
 
 const CreateEventPage = () => {
   const navigate = useNavigate();
@@ -29,9 +26,10 @@ const CreateEventPage = () => {
       description: data.description,
       location: data.location,
       capacity: data.capacity,
-      //TODO: visibility: data.visibility,
+      type: data.type.toUpperCase(),
       eventDate,
     };
+    console.log(dto);
     createMutation.mutate(dto);
   };
 
@@ -40,7 +38,7 @@ const CreateEventPage = () => {
       <Navbar />
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-2xl w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Кнопка "Назад" */}
+          {/* Back button */}
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-gray-600 mb-8 hover:text-black transition-colors"
@@ -58,7 +56,7 @@ const CreateEventPage = () => {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Назва події */}
+            {/* Event title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Event Title <span className="text-red-500">*</span>
@@ -71,11 +69,10 @@ const CreateEventPage = () => {
                 required
               />
             </div>
-
-            {/* Опис */}
+            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description <span className="text-red-500">*</span>
+                Description
               </label>
               <textarea
                 {...register("description")}
@@ -84,8 +81,7 @@ const CreateEventPage = () => {
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
               ></textarea>
             </div>
-
-            {/* Дата та Час */}
+            {/* Date and Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -112,8 +108,7 @@ const CreateEventPage = () => {
                 />
               </div>
             </div>
-
-            {/* Локація */}
+            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Location <span className="text-red-500">*</span>
@@ -126,8 +121,7 @@ const CreateEventPage = () => {
                 required
               />
             </div>
-
-            {/* Місткість */}
+            {/* Capacity */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Capacity (optional)
@@ -150,15 +144,15 @@ const CreateEventPage = () => {
                 capacity.
               </p>
             </div>
-            {/* Видимість (Radio)
+            {/* Visibility */}
             <div className="space-y-3">
               <p className="text-sm font-medium text-gray-700">Visibility</p>
 
               <label className="flex items-center space-x-3 cursor-pointer group">
                 <input
-                //TODO: {...register("visibility")}
+                  {...register("type")}
                   type="radio"
-                  name="visibility"
+                  value="PUBLIC"
                   defaultChecked
                   className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                 />
@@ -170,8 +164,9 @@ const CreateEventPage = () => {
 
               <label className="flex items-center space-x-3 cursor-pointer group">
                 <input
+                  {...register("type")}
                   type="radio"
-                  name="visibility"
+                  value="PRIVATE"
                   className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500"
                 />
                 <span className="text-sm text-gray-700">
@@ -179,9 +174,8 @@ const CreateEventPage = () => {
                   people can see this event
                 </span>
               </label>
-            </div> */}
-
-            {/* Кнопки дій */}
+            </div>
+            {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button
                 type="button"

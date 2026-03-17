@@ -1,7 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../api/axios";
 import Navbar from "../components/Navbar";
-import { useEvent, useJoinEvent, useLeaveEvent } from "../hooks/useEvents";
+import {
+  useDeleteEvent,
+  useEvent,
+  useJoinEvent,
+  useLeaveEvent,
+} from "../hooks/useEvents";
 
 const EventDetailsPage = () => {
   const { id } = useParams();
@@ -9,8 +13,9 @@ const EventDetailsPage = () => {
   const { data: event, isLoading, isError } = useEvent(id || "");
   const joinMutation = useJoinEvent();
   const leaveMutation = useLeaveEvent();
+  const deleteEvent = useDeleteEvent();
 
-  //TODO: Дизайн сторінки або авто редірект для відсутньої події
+  //TODO: Design 404 page or autoredirect
   if (isError) {
     return (
       <div className="error-container">
@@ -28,11 +33,9 @@ const EventDetailsPage = () => {
     event.isParticipant ? leaveMutation.mutate(id!) : joinMutation.mutate(id!);
   };
 
-  const handleDelete = async () => {
-    if (window.confirm("Delete this event?")) {
-      await api.delete(`/events/${id}`);
-      navigate("/events");
-    }
+  const handleDelete = () => {
+    if (window.confirm("Delete this event?")) deleteEvent.mutate(id!);
+    navigate("/events");
   };
 
   return (

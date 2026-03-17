@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum EventType {
+  PUBLIC
+  PRIVATE
+}
+
 model User {
   id            String         @id @default(uuid())
   email         String         @unique
@@ -33,6 +38,7 @@ model Event {
   creatorId   String
   creator     User          @relation("UserCreatedEvents", fields: [creatorId], references: [id])
   participants Participant[]
+  type        EventType     @default(PUBLIC)
 }
 
 model Participant {
@@ -40,6 +46,6 @@ model Participant {
   eventId   String
   joinedAt  DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   @@id([userId, eventId])
 }

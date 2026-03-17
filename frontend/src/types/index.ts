@@ -20,6 +20,7 @@ export interface Event {
   capacity?: number;
   creatorId: string;
   createdAt: Date;
+  type: string;
   // Optional fields for convenience
   creator?: User;
   participants?: Participant[];
@@ -60,6 +61,7 @@ export interface CreateEventDto {
   eventDate: string; // ISO String
   location?: string;
   capacity?: number;
+  type: string;
 }
 
 // PATCH /events/:id
@@ -77,12 +79,18 @@ export interface EventDetailResponse extends Event {
   participants: (Participant & { user: User })[];
 }
 
-export interface CreateEventFormValues extends Omit<CreateEventDto, "eventDate"> {
+export interface CreateEventFormValues extends Omit<
+  CreateEventDto,
+  "eventDate"
+> {
   formDate: string;
   formTime: string;
 }
 
-export interface UpdateEventFormValues extends Omit<UpdateEventDto, "eventDate"> {
+export interface UpdateEventFormValues extends Omit<
+  UpdateEventDto,
+  "eventDate"
+> {
   formDate: string;
   formTime: string;
 }
