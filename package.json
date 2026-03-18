@@ -3,7 +3,8 @@
     "backfront": "concurrently --names \"BACK,FRONT\" --prefix-colors \"yellow,blue\" \"npm run start:dev --prefix backend\" \"npm run dev --prefix frontend\""
   },
   "dependencies": {
-    "dotenv": "^17.3.1"
+    "dotenv": "^17.3.1",
+    "lucide-react": "^0.577.0"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

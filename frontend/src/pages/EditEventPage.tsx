@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useParams, useNavigate, data } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useEditEvent, useEvent } from "../hooks/useEvents";
 import type { UpdateEventDto, UpdateEventFormValues } from "../types";
