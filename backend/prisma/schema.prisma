@@ -5,12 +5,16 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum EventType {
+  PUBLIC
+  PRIVATE
 }
 
 model User {
@@ -29,10 +33,12 @@ model Event {
   description String?
   eventDate   DateTime
   location    String?
+  capacity    Int?
   createdAt   DateTime      @default(now())
   creatorId   String
   creator     User          @relation("UserCreatedEvents", fields: [creatorId], references: [id])
   participants Participant[]
+  type        EventType     @default(PUBLIC)
 }
 
 model Participant {
@@ -40,6 +46,6 @@ model Participant {
   eventId   String
   joinedAt  DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   @@id([userId, eventId])
 }

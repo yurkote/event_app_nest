@@ -1,0 +1,74 @@
+import { useForm } from "react-hook-form";
+import { Link, Navigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
+import type { LoginDto } from "../types";
+import { useLogin } from "../hooks/authHooks";
+
+const LoginPage = () => {
+  const { register, handleSubmit } = useForm<LoginDto>();
+  const { token } = useAuthStore();
+  const { mutate, isPending } = useLogin();
+
+  if (token) {
+    return <Navigate to="/events" replace />;
+  }
+
+  const onSubmit = (data: LoginDto) => {
+    mutate(data);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Log In
+        </h2>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              {...register("email", { required: true })}
+              type="email"
+              disabled={isPending}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
+              placeholder="you@example.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              {...register("pass", { required: true })}
+              type="password"
+              disabled={isPending}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200 disabled:bg-blue-400"
+          >
+            {isPending ? "Logging in..." : "Log In"}
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-blue-600 hover:underline">
+            Sign Up
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default LoginPage;

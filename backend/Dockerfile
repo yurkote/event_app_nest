@@ -24,4 +24,5 @@ RUN npm run build
 EXPOSE 3000
 
 # Запуск додатка
-CMD ["npm", "run", "start:dev"]
+# CMD ["npm", "run", "start:dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
