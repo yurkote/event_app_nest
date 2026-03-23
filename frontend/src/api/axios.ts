@@ -2,8 +2,10 @@ import axios from "axios";
 import { useAuthStore } from "../store/authStore";
 import type { ApiErrorResponse } from "../types";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const api = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: API_URL,
   withCredentials: true,
 });
 

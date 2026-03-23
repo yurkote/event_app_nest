@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 
 services:
   db:
@@ -21,7 +21,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: "postgresql://user:password@db:5433/event_manager?schema=public"
+      DATABASE_URL: "postgresql://user:password@db:5432/event_manager?schema=public"
     depends_on:
       - db
 
@@ -29,7 +29,9 @@ services:
     build: ./frontend
     container_name: event_client
     ports:
-      - "5173:5173" # Порт для Vite
+      - "8088:80"
+    environment:
+      VITE_API_URL: "https://yurkote.dev/event-api"
     depends_on:
       - api
 
